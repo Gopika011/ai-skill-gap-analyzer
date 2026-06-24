@@ -1,0 +1,49 @@
+<div class="page">
+  <h2>Skills</h2>
+
+  <form (ngSubmit)="editingId ? update() : create()" class="form-row">
+    <input [(ngModel)]="form.skillName" name="name" placeholder="Skill name" required />
+    <input [(ngModel)]="form.description" name="desc" placeholder="Description (optional)" />
+    <select [(ngModel)]="form.categoryId" name="cat" required>
+      <option [ngValue]="null" disabled>Select category</option>
+      @for (c of categories; track c.id) {
+        <option [ngValue]="c.id">{{ c.categoryName }}</option>
+      }
+    </select>
+    <button type="submit">{{ editingId ? 'Update' : 'Add' }}</button>
+    @if (editingId) {
+      <button type="button" (click)="cancelEdit()">Cancel</button>
+    }
+  </form>
+
+  @if (errorMessage) {
+    <div class="alert-error" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+      <span>⚠️ {{ errorMessage }}</span>
+      <button type="button" (click)="errorMessage = ''" style="background: none; border: none; color: #b91c1c; font-size: 1.1rem; cursor: pointer; padding: 0 4px;">&times;</button>
+    </div>
+  }
+
+  @if (loading) {
+    <p class="muted">Loading…</p>
+  } @else {
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Skill</th><th>Category</th><th>Description</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        @for (s of skills; track s.id) {
+          <tr>
+            <td>{{ s.id }}</td>
+            <td>{{ s.skillName }}</td>
+            <td>{{ s.categoryName }}</td>
+            <td>{{ s.description || '—' }}</td>
+            <td class="actions">
+              <button type="button" (click)="startEdit(s)">Edit</button>
+              <button type="button" (click)="delete(s.id)" class="danger">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

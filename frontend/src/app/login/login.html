@@ -1,0 +1,52 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>Welcome Back</h2>
+      <!-- <p class="muted">Log in to manage employee skills and project gaps</p> -->
+    </div>
+
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="name@company.com"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="pass">Password</label>
+        <input
+          id="pass"
+          type="password"
+          [(ngModel)]="pass"
+          name="pass"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+
+      @if (message) {
+        <div class="alert" [class.alert-danger]="isError" [class.alert-success]="!isError">
+          {{ message }}
+        </div>
+      }
+
+      <button type="submit" [disabled]="loading" class="btn-auth">
+        @if (loading) {
+          Logging in...
+        } @else {
+          Log In
+        }
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account? <a routerLink="/register">Register</a></p>
+    </div>
+  </div>
+</div>

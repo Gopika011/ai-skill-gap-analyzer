@@ -1,0 +1,21 @@
+<nav class="app-nav">
+  @if (currentUser) {
+    <a routerLink="/categories" routerLinkActive="active">Categories</a>
+    <a routerLink="/skills" routerLinkActive="active">Skills</a>
+    <a routerLink="/employee-skills" routerLinkActive="active">Employee Skills</a>
+    <a routerLink="/projects" routerLinkActive="active">Projects</a>
+    <a routerLink="/gap-analysis" routerLinkActive="active">Gap Analysis</a>
+    <span class="spacer"></span>
+    <span class="user-info">{{ currentUser?.email }}</span>
+    <button (click)="logout()" class="btn-logout">Logout</button>
+  } @else {
+    <span class="brand-title">AI Skill Manager</span>
+    <span class="spacer"></span>
+    <a routerLink="/login" routerLinkActive="active">Login</a>
+    <a routerLink="/register" routerLinkActive="active">Register</a>
+  }
+</nav>
+
+<main>
+  <router-outlet />
+</main>

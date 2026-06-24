@@ -1,0 +1,35 @@
+<div class="page">
+  <h2>Categories</h2>
+
+  <form (ngSubmit)="create()" class="form-row">
+    <input [(ngModel)]="newName" name="name" placeholder="Category name" required />
+    <input [(ngModel)]="newDesc" name="desc" placeholder="Description (optional)" />
+    <button type="submit">Add</button>
+  </form>
+
+  @if (errorMessage) {
+    <div class="alert-error" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+      <span>⚠️ {{ errorMessage }}</span>
+      <button type="button" (click)="errorMessage = ''" style="background: none; border: none; color: #b91c1c; font-size: 1.1rem; cursor: pointer; padding: 0 4px;">&times;</button>
+    </div>
+  }
+
+  @if (loading) {
+    <p class="muted">Loading…</p>
+  } @else {
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Name</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        @for (c of categories; track c.id) {
+          <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.categoryName }}</td>
+            <td>{{ c.description || '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

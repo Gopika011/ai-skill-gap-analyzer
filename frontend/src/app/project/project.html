@@ -1,0 +1,140 @@
+<div class="page">
+  <h2>Projects</h2>
+
+  @if (errorMessage) {
+    <div class="alert-error" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+      <span>⚠️ {{ errorMessage }}</span>
+      <button type="button" (click)="errorMessage = ''" style="background: none; border: none; color: #b91c1c; font-size: 1.1rem; cursor: pointer; padding: 0 4px;">&times;</button>
+    </div>
+  }
+
+  <!-- Create Project Card -->
+  <div class="simple-card">
+    <h3>Create New Project</h3>
+    <form (ngSubmit)="create()" class="simple-form">
+      <input [(ngModel)]="form.name" name="name" placeholder="Project name" required />
+      <input [(ngModel)]="form.description" name="desc" placeholder="Description" />
+      <div class="field">
+        <label>Start Date</label>
+        <input [(ngModel)]="form.startDate" name="start" type="date" required />
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input [(ngModel)]="form.endDate" name="end" type="date" required />
+      </div>
+      <button type="submit">Create</button>
+    </form>
+  </div>
+
+  <!-- Projects List Table -->
+  <div class="table-container">
+    @if (loading) {
+      <p class="muted">Loading projects…</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of projects; track p.id) {
+            <tr [class.selected-row]="selectedProject?.id === p.id" (click)="selectProject(p)" class="clickable-row">
+              <td>{{ p.id }}</td>
+              <td><strong>{{ p.name }}</strong></td>
+              <td>{{ p.description || '—' }}</td>
+              <td>{{ p.startDate | date:'mediumDate' }}</td>
+              <td>{{ p.endDate | date:'mediumDate' }}</td>
+              <td class="actions">
+                <button type="button" (click)="selectProject(p); $event.stopPropagation()">Manage</button>
+                <button type="button" (click)="deleteProject(p.id); $event.stopPropagation()" class="danger">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="muted text-center">No projects yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Manage Selected Project Details -->
+  @if (selectedProject) {
+    <div class="simple-card details-card">
+      <div class="details-header">
+        <h3>Managing Project: {{ selectedProject.name }}</h3>
+        <button type="button" (click)="selectedProject = null" class="close-btn">Close Details</button>
+      </div>
+      
+      @if (detailsLoading) {
+        <p class="muted">Loading details…</p>
+      } @else {
+        <div class="management-grid">
+          <!-- Skills Requirements -->
+          <div class="mgmt-section">
+            <h4>Required Skills</h4>
+            
+            <form (ngSubmit)="addRequirement()" class="inline-form">
+              <select [(ngModel)]="requirementForm.skillId" name="reqSkill" required>
+                <option [ngValue]="null" disabled selected>Select Skill</option>
+                @for (s of skills; track s.id) {
+                  <option [ngValue]="s.id">{{ s.skillName }}</option>
+                }
+              </select>
+              <select [(ngModel)]="requirementForm.requiredLevel" name="reqLevel" required>
+                @for (lvl of levels; track lvl) {
+                  <option [value]="lvl">{{ lvl }}</option>
+                }
+              </select>
+              <button type="submit" [disabled]="requirementForm.skillId == null">Add</button>
+            </form>
+
+            <ul class="item-list">
+              @for (req of requirements; track req.skillId) {
+                <li>
+                  <span>{{ req.skillName }} ({{ req.requiredLevel }})</span>
+                  <button type="button" (click)="removeRequirement(req.skillId)" class="remove-item-btn">&times;</button>
+                </li>
+              } @empty {
+                <li class="empty-list-msg">No skill requirements added yet.</li>
+              }
+            </ul>
+          </div>
+
+          <!-- Team Assignments -->
+          <div class="mgmt-section">
+            <h4>Assigned Employees</h4>
+            
+            <form (ngSubmit)="assignEmployee()" class="inline-form">
+              <select [(ngModel)]="employeeForm.userId" name="assignUser" required>
+                <option [ngValue]="null" disabled selected>Select Employee</option>
+                @for (u of users; track u.id) {
+                  <option [ngValue]="u.id">{{ u.email }}</option>
+                }
+              </select>
+              <button type="submit" [disabled]="employeeForm.userId == null">Assign</button>
+            </form>
+
+            <ul class="item-list">
+              @for (emp of employees; track emp.id) {
+                <li>
+                  <span>{{ emp.name }}</span>
+                  <button type="button" (click)="removeEmployee(emp.id)" class="remove-item-btn">&times;</button>
+                </li>
+              } @empty {
+                <li class="empty-list-msg">No employees assigned yet.</li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
