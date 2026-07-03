@@ -1,0 +1,149 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111827;
+  background: #f8fafc;
+}
+
+.page { padding: 20px 24px; max-width: 880px; margin: 0 auto; }
+h2 { margin: 0 0 14px; font-size: 1.35rem; }
+
+.muted { color: #6b7280; font-size: 0.9rem; }
+
+.form-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-row input,
+.form-row select {
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.form-row button {
+  padding: 7px 14px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.form-row button:hover { background: #1d4ed8; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.add-form { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+th { background: #f3f4f6; font-weight: 600; }
+
+.actions { display: flex; gap: 6px; }
+
+button.danger { background: #dc2626; }
+button.danger:hover { background: #b91c1c; }
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+/* Print CSS - Global to override View Encapsulation */
+@media print {
+  /* Hide navigation bar */
+  .app-nav {
+    display: none !important;
+  }
+
+  /* Hide main content components of the gap analysis page */
+  .page-header,
+  .analysis-card,
+  .results-wrapper,
+  .analysis-loading,
+  .alert-error-dismissible,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset body and wrapper layouts for printing */
+  body, main, .page {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove fixed centering overlay styles of modal backdrop */
+  .modal-backdrop {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    z-index: auto !important;
+    display: block !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Remove modal borders, shadows and styling constraints */
+  .modal-content {
+    border: none !important;
+    box-shadow: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    width: 100% !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .modal-body {
+    padding: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    display: block !important;
+  }
+
+  /* Print document styling to span full page width */
+  .report-document {
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    background: transparent !important;
+  }
+
+  /* Force background colors to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

@@ -1,0 +1,212 @@
+<div class="page">
+  <h2>Employees Management</h2>
+
+  <div *ngIf="errorMessage" class="alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="alert-success">
+    {{ successMessage }}
+  </div>
+
+  <div class="management-grid">
+    <!-- Left: Form to Add Single Employee -->
+    <div class="simple-card">
+      <h3>Add Single Employee</h3>
+      <form (ngSubmit)="createEmployee()" class="simple-form-vertical">
+        <label class="field">
+          <span>Employee ID</span>
+          <input
+            [(ngModel)]="form.id"
+            name="id"
+            type="text"
+            placeholder="e.g. E001"
+            required
+            [disabled]="submitting"
+          />
+        </label>
+        
+        <label class="field">
+          <span>Full Name</span>
+          <input
+            [(ngModel)]="form.name"
+            name="name"
+            type="text"
+            placeholder="e.g. John Doe"
+            required
+            [disabled]="submitting"
+          />
+        </label>
+
+        <label class="field">
+          <span>Email Address</span>
+          <input
+            [(ngModel)]="form.email"
+            name="email"
+            type="email"
+            placeholder="e.g. john.doe@example.com"
+            required
+            [disabled]="submitting"
+          />
+        </label>
+
+        <button type="submit" [disabled]="submitting || !form.id.trim() || !form.name.trim() || !form.email.trim()" class="btn-primary">
+          {{ submitting ? 'Adding...' : 'Add Employee' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Right: Excel/CSV Import -->
+    <div class="simple-card">
+      <h3>Bulk Excel / CSV Import</h3>
+      <p class="card-desc">
+        Upload a spreadsheet to import employees. The file should contain headers for 
+        <strong>ID</strong>, <strong>Name</strong>, and <strong>Email</strong>.
+      </p>
+
+      <div class="upload-zone">
+        <input 
+          type="file" 
+          (change)="onFileChange($event)" 
+          accept=".xlsx, .xls, .csv" 
+          id="excel-file-input"
+          class="hidden-file-input"
+        />
+        <label for="excel-file-input" class="upload-label">
+          <div class="upload-icon">📊</div>
+          <span>Select spreadsheet (.xlsx, .xls, .csv)</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Excel Import Preview Modal -->
+  <div *ngIf="showImportPreview" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Spreadsheet Import Preview</h3>
+        <button type="button" class="close-btn" (click)="clearImport()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="import-stats">
+          <span class="stat-badge total">Total Rows: {{ importPreview.length }}</span>
+          <span class="stat-badge valid">Valid: {{ validImportCount }}</span>
+          <span class="stat-badge invalid">Invalid: {{ importPreview.length - validImportCount }}</span>
+        </div>
+
+        <p class="import-instructions">
+          Rows marked as <strong>Valid</strong> will be imported. Rows marked as <strong>Invalid</strong> will be skipped.
+        </p>
+
+        <div class="table-container preview-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Reason / Warning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of importPreview">
+                <td>
+                  <code class="emp-id-code">{{ row.id || 'Missing' }}</code>
+                </td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.email }}</td>
+                <td>
+                  <span class="badge" [ngClass]="row.status === 'Valid' ? 'severity-none' : 'severity-critical'">
+                    {{ row.status }}
+                  </span>
+                </td>
+                <td class="text-warning">{{ row.warning || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="close-btn" (click)="clearImport()">Cancel</button>
+        <button 
+          type="button" 
+          [disabled]="validImportCount === 0 || submitting" 
+          class="btn-primary" 
+          (click)="submitImport()"
+        >
+          {{ submitting ? 'Importing...' : 'Import ' + validImportCount + ' Employees' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- Employees List Table -->
+  <h3>Employees Directory</h3>
+
+  <div *ngIf="loading && employees.length === 0" class="loading-container">
+    <div class="spinner"></div>
+    <p class="muted">Loading employees...</p>
+  </div>
+
+  <div *ngIf="!loading && employees.length === 0" class="empty-state">
+    <p class="muted">No employees registered yet. Use the forms above to add or import employees.</p>
+  </div>
+
+  <div *ngIf="employees.length > 0" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Employee ID</th>
+          <th>Name</th>
+          <th>Email Address</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emp of employees" [class.editing-row]="editingEmployeeId === emp.id">
+          <!-- ID Col -->
+          <td>
+            <code class="emp-id-code">{{ emp.id }}</code>
+          </td>
+
+          <!-- Name Col -->
+          <td>
+            <ng-container *ngIf="editingEmployeeId !== emp.id; else editNameTpl">
+              {{ emp.name }}
+            </ng-container>
+            <ng-template #editNameTpl>
+              <input [(ngModel)]="editForm.name" name="editName" class="table-input" required />
+            </ng-template>
+          </td>
+
+          <!-- Email Col -->
+          <td>
+            <ng-container *ngIf="editingEmployeeId !== emp.id; else editEmailTpl">
+              {{ emp.email }}
+            </ng-container>
+            <ng-template #editEmailTpl>
+              <input [(ngModel)]="editForm.email" name="editEmail" type="email" class="table-input" required />
+            </ng-template>
+          </td>
+
+          <!-- Actions Col -->
+          <td class="actions-col">
+            <ng-container *ngIf="editingEmployeeId !== emp.id; else editActionsTpl">
+              <button type="button" class="btn-edit" (click)="startEdit(emp)">Edit</button>
+              <button type="button" class="danger" (click)="deleteEmployee(emp.id)">Delete</button>
+            </ng-container>
+            <ng-template #editActionsTpl>
+              <button type="button" class="btn-save" (click)="updateEmployee(emp.id)" [disabled]="submitting">Save</button>
+              <button type="button" class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
